@@ -1,7 +1,7 @@
 package shiptheory
 
 import (
-	"net/http"
+	"fmt"
 )
 
 func outputMsg(msg string) {

@@ -10,3 +10,12 @@ import (
 func TestOutputMessage(t *testing.T) {
     outputMsg("test")
 }
+
+func TestToken(t *testing.T) {
+	client := ShiptheoryClient{
+		username: "dan.rogers@shiptheory.com",
+		password: "XVwkQx!KbW8Du8j",
+	}
+
+	client.validateToken()
+}

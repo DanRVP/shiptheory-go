@@ -1,7 +1,7 @@
 package shiptheory
 
 import (
-	"net/http"
+	"log"
 	"time"
 )
 
@@ -13,13 +13,10 @@ type ShiptheoryClient struct {
 	password string
 }
 
-func makeShiptheoryApiRequest() {
-
-}
 
 func (client ShiptheoryClient) validateToken() {
 	if len(client.token.accessToken) < 1 || client.checkTokenLifeExpired() {
-		client.token.refreshAccessToken()
+		client.token.getAccessToken(client.username, client.password)
 	}
 }
 
@@ -29,3 +26,8 @@ func (client ShiptheoryClient) checkTokenLifeExpired() bool {
 	return diff.Minutes() > 58 // Refresh 2 mins before token expires. Tokens last for 1 hr.
 }
 
+func checkError(err error) {
+	if err != nil {
+        log.Fatal(err)
+    }
+}
