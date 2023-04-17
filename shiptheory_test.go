@@ -13,8 +13,8 @@ func TestOutputMessage(t *testing.T) {
 
 func TestToken(t *testing.T) {
 	client := ShiptheoryClient{
-		username: "dan.rogers@shiptheory.com",
-		password: "XVwkQx!KbW8Du8j",
+		username: "",
+		password: "",
 	}
 
 	client.validateToken()
