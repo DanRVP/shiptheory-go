@@ -1,11 +1,9 @@
 package shiptheory
 
 import (
-	"log"
 	"time"
+	"http"
 )
-
-const BASE_URL = "https://api.shiptheory.com/v1/"
 
 type ShiptheoryClient struct {
 	token ShiptheoryToken
@@ -13,10 +11,11 @@ type ShiptheoryClient struct {
 	password string
 }
 
-
 func (client ShiptheoryClient) validateToken() {
+	var err error
 	if len(client.token.accessToken) < 1 || client.checkTokenLifeExpired() {
-		client.token.getAccessToken(client.username, client.password)
+		client.token, err = client.getAccessToken(client.username, client.password)
+		checkError(err)
 	}
 }
 
@@ -26,8 +25,13 @@ func (client ShiptheoryClient) checkTokenLifeExpired() bool {
 	return diff.Minutes() > 58 // Refresh 2 mins before token expires. Tokens last for 1 hr.
 }
 
-func checkError(err error) {
-	if err != nil {
-        log.Fatal(err)
-    }
+func (client ShiptheoryClient) getAccessToken(username string, password string) (ShiptheoryToken, error) {
+	body := map[string]string{
+		"email": username,
+		"password": password,
+	}
+
+	token_response, err := makeShiptheoryApiRequest(http.MethodPost, "token", body)
+	checkError(err)
+	client.token.accessToken = token_response.data.token
 }
