@@ -3,17 +3,17 @@ package shiptheory
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"net/http"
 	"time"
 	"strings"
 	"errors"
 	"log"
+	"io"
 )
 
 const BASE_URL = "https://api.shiptheory.com/v1/"
 
-func makeShiptheoryApiRequest(method string, endpoint string, body interface{}) (interface{}, error) {
+func makeShiptheoryApiRequest(method string, endpoint string, body interface{}, success_body interface{}, error_body interface{}) (error) {
 	var json_data []byte
 	var err error
 	var http_method string
@@ -26,16 +26,24 @@ func makeShiptheoryApiRequest(method string, endpoint string, body interface{}) 
 		case http.MethodPut:
 			http_method = http.MethodPut
 		default:
-			return nil, errors.New("Invalid HTTP method not supported by Shiptheory API")
+			return errors.New("Invalid HTTP method not supported by Shiptheory API")
 	}
 
+	var req *http.Request
 	if body != nil {
 		json_data, err = json.Marshal(body)
-		checkError(err)
+		if err != nil {
+			return err
+		}
+
+		req, err = http.NewRequest(http_method, BASE_URL + endpoint, bytes.NewBuffer(json_data))
+	} else {
+		req, err = http.NewRequest(http_method, BASE_URL + endpoint, nil)
 	}
 
-	req, err := http.NewRequest(http_method, BASE_URL + endpoint, bytes.NewBuffer(json_data))
-    checkError(err)
+	if err != nil {
+		return err
+	}
 
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
@@ -45,17 +53,23 @@ func makeShiptheoryApiRequest(method string, endpoint string, body interface{}) 
 	}
 
 	res, err := client.Do(req)
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
 	res_body, err := io.ReadAll(res.Body)
-	checkError(err)
+	if err != nil {
+		return err
+	}
 
-	var i interface{}
-	err = json.Unmarshal(res_body, &i)
+	if res.StatusCode >= 200 && res.StatusCode < 300 {
+		err = json.Unmarshal(res_body, &success_body)
+	} else {
+		err = json.Unmarshal(res_body, &error_body)
+	}
+
 	res.Body.Close()
-	checkError(err)
-
-	return i, nil
+	return err
 }
 
 func checkError(err error) {
