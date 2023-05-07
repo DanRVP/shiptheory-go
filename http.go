@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
-	"strings"
 	"errors"
 	"log"
 	"io"
@@ -18,15 +17,8 @@ func makeShiptheoryApiRequest(method string, endpoint string, body interface{}, 
 	var err error
 	var http_method string
 
-	switch strings.ToUpper(method) {
-		case http.MethodPost:
-			http_method = http.MethodPost
-		case http.MethodGet:
-			http_method = http.MethodGet
-		case http.MethodPut:
-			http_method = http.MethodPut
-		default:
-			return errors.New("Invalid HTTP method not supported by Shiptheory API")
+	if !isValidHttpMethod(method) {
+		return errors.New("invalid HTTP method not supported by Shiptheory API")
 	}
 
 	var req *http.Request
@@ -76,4 +68,15 @@ func checkError(err error) {
 	if err != nil {
         log.Fatal(err)
     }
+}
+
+func isValidHttpMethod(method string) bool {
+	valid_methods := [3]string{http.MethodGet, http.MethodPost, http.MethodPut}
+	for _, http_method := range valid_methods {
+		if http_method == method {
+			return true
+		}
+	}
+
+	return false
 }

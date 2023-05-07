@@ -1,6 +1,8 @@
 package shiptheory
 
 import (
+	"errors"
+	"net/http"
 	"time"
 )
 
@@ -9,22 +11,37 @@ type ShiptheoryToken struct {
 	lastRefresh time.Time
 }
 
-type TokenResponseBody struct {
-	Success bool `json:"string"`
-	Data TokenResponseBodyPartData `json:"data"`
+func (token *ShiptheoryToken) validateToken(username string, password string) error {
+	if len(token.accessToken) < 1 || token.checkTokenLifeExpired() {
+		return token.refreshAccessToken(username, password)
+	}
+
+	return nil
 }
 
-type TokenResponseBodyPartData struct {
-	Token string `json:"token"`
+func (token *ShiptheoryToken) checkTokenLifeExpired() bool {
+	now := time.Now()
+	diff := now.Sub(token.lastRefresh)
+	return diff.Minutes() > 58 // Refresh 2 mins before token expires. Tokens last for 1 hr.
 }
 
-type TokenRequestBody struct {
-	Email string `json:"email"`
-	Password string `json:"password"`
-}
+func (token *ShiptheoryToken) refreshAccessToken(username string, password string) (error) {
+	var body TokenRequestBody = TokenRequestBody{
+		Email: username,
+		Password: password,
+	}
 
-type TokenErrorBody struct {
-	Message string `json:"message"`
-	Url string `json:"url"`
-	Code int `json:"code"`
+	var res_body TokenResponseBody = TokenResponseBody{}
+	var err_body TokenErrorBody = TokenErrorBody{}
+	err := makeShiptheoryApiRequest(http.MethodPost, "token", body, &res_body, &err_body)
+	checkError(err)
+
+	if err_body.Message != "" {
+		return errors.New(err_body.Message)
+	} else {
+		token.accessToken = res_body.Data.Token
+		token.lastRefresh = time.Now()
+
+		return nil
+	}
 }
