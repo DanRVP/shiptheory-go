@@ -10,12 +10,13 @@ import (
 	"io"
 )
 
+// Shiptheory base URL.
 const BASE_URL = "https://api.shiptheory.com/v1/"
 
-func makeShiptheoryApiRequest(method string, endpoint string, body interface{}, success_body interface{}, error_body interface{}) (error) {
+// Make a request to Shiptheory and process the result.
+func (shiptheoryClient *ShiptheoryClient) makeShiptheoryApiRequest(method string, endpoint string, body interface{}, success_body interface{}, error_body interface{}) (error) {
 	var json_data []byte
 	var err error
-	var http_method string
 
 	if !isValidHttpMethod(method) {
 		return errors.New("invalid HTTP method not supported by Shiptheory API")
@@ -28,9 +29,9 @@ func makeShiptheoryApiRequest(method string, endpoint string, body interface{}, 
 			return err
 		}
 
-		req, err = http.NewRequest(http_method, BASE_URL + endpoint, bytes.NewBuffer(json_data))
+		req, err = http.NewRequest(method, BASE_URL + endpoint, bytes.NewBuffer(json_data))
 	} else {
-		req, err = http.NewRequest(http_method, BASE_URL + endpoint, nil)
+		req, err = http.NewRequest(method, BASE_URL + endpoint, nil)
 	}
 
 	if err != nil {
@@ -39,6 +40,13 @@ func makeShiptheoryApiRequest(method string, endpoint string, body interface{}, 
 
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
+	if shiptheoryClient.token.accessToken != "" {
+		req.Header.Add("Authorization", "Bearer " + shiptheoryClient.token.accessToken)
+	}
+
+	if shiptheoryClient.partnerTag != "" {
+		req.Header.Add("Shiptheory-Partner-Tag", shiptheoryClient.partnerTag)
+	}
 
 	client := http.Client{
 		Timeout: time.Duration(5) * time.Second,
@@ -70,6 +78,7 @@ func checkError(err error) {
     }
 }
 
+// Validate whether a string is a valid HTTP method supported by Shiptheory's API.
 func isValidHttpMethod(method string) bool {
 	valid_methods := [3]string{http.MethodGet, http.MethodPost, http.MethodPut}
 	for _, http_method := range valid_methods {

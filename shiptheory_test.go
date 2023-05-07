@@ -16,7 +16,7 @@ func TestToken(t *testing.T) {
 		password: password,
 	}
 
-	client.viewShipment(123)
+	client.ViewShipment(123)
 }
 
 func TestViewShipment(t *testing.T) {
@@ -30,5 +30,6 @@ func TestViewShipment(t *testing.T) {
 		token: ShiptheoryToken{},
 	}
 
-	client.viewShipment(123)
+	_, err = client.ViewShipment(680)
+	checkError(err)
 }
