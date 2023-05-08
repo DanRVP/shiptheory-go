@@ -38,15 +38,7 @@ func (shiptheoryClient *ShiptheoryClient) makeShiptheoryApiRequest(method string
 		return err
 	}
 
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Content-Type", "application/json")
-	if shiptheoryClient.token.accessToken != "" {
-		req.Header.Add("Authorization", "Bearer " + shiptheoryClient.token.accessToken)
-	}
-
-	if shiptheoryClient.partnerTag != "" {
-		req.Header.Add("Shiptheory-Partner-Tag", shiptheoryClient.partnerTag)
-	}
+	shiptheoryClient.appendHeaders(req)
 
 	client := http.Client{
 		Timeout: time.Duration(5) * time.Second,
@@ -88,4 +80,17 @@ func isValidHttpMethod(method string) bool {
 	}
 
 	return false
+}
+
+// Append appropriate headers for a request to Shiptheory to a http.Request object.
+func (shiptheoryClient *ShiptheoryClient) appendHeaders(req *http.Request) {
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	if shiptheoryClient.token.accessToken != "" {
+		req.Header.Add("Authorization", "Bearer " + shiptheoryClient.token.accessToken)
+	}
+
+	if shiptheoryClient.partnerTag != "" {
+		req.Header.Add("Shiptheory-Partner-Tag", shiptheoryClient.partnerTag)
+	}
 }

@@ -47,15 +47,36 @@ func (client *ShiptheoryClient) refreshAccessToken(username string, password str
 	}
 }
 
-// Make a request to `shipments/view/{ref}`
-func (client *ShiptheoryClient) ViewShipment(id int) (shipment string, err error) {
+// Make a GET request to `shipments/view/{ref}`
+func (client *ShiptheoryClient) ViewShipment(id int) (res_body ViewShipmentResponseBody, err error) {
 	err = client.validateToken(client.username, client.password)
 	checkError(err)
 
 	endpoint := "shipments/" + strconv.Itoa(id)
-	var res_body ViewShipmentResponseBody = ViewShipmentResponseBody{}
 	var err_body TokenErrorBody = TokenErrorBody{}
 	err = client.makeShiptheoryApiRequest(http.MethodGet, endpoint, nil, &res_body, &err_body)
+	checkError(err)
 
-	return shipment, err
+	if err_body.Message != "" {
+		return res_body, errors.New(err_body.Message)
+	}
+
+	return res_body, nil
+}
+
+// Make a POST request to `shipments`
+func (client *ShiptheoryClient) BookShipment(body BookShipmentRequestBody) (res_body ViewShipmentResponseBody, err error) {
+	err = client.validateToken(client.username, client.password)
+	checkError(err)
+
+	endpoint := "shipments"
+	var err_body TokenErrorBody = TokenErrorBody{}
+	err = client.makeShiptheoryApiRequest(http.MethodPost, endpoint, body, &res_body, &err_body)
+	checkError(err)
+
+	if err_body.Message != "" {
+		return res_body, errors.New(err_body.Message)
+	}
+
+	return res_body, nil
 }
