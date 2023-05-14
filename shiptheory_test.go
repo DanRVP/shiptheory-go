@@ -3,6 +3,8 @@ package shiptheory
 import (
 	"os"
 	"testing"
+	"time"
+	"strconv"
 )
 
 // Test getting a token from Shiptheory.
@@ -45,9 +47,10 @@ func TestBookShipment(t *testing.T) {
 		token: ShiptheoryToken{},
 	}
 
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	body := BookShipmentRequestBody{
-		Reference: "1234567890",
-		Reference2: "1234567890",
+		Reference: "S-" + timestamp,
+		Reference2: "O-" + timestamp,
 		ShipmentDetail: BookShipmentRequestBodyShipmentDetail{
 			Weight: 1,
 			Parcels: 1,
@@ -73,11 +76,11 @@ func TestBookShipment(t *testing.T) {
 			},
 			What3words: "///what.three.words",
 			TaxNumbers: []BookShipmentRequestBodyRecipientTaxNumber{
-				BookShipmentRequestBodyRecipientTaxNumber{
+				{
 					TaxNumber: "GB205672212000",
 					TaxNumberType: "EORI",
 				},
-				BookShipmentRequestBodyRecipientTaxNumber{
+				{
 					TaxNumber: "GB123456789",
 					TaxNumberType: "VAT",
 				},
@@ -97,7 +100,7 @@ func TestBookShipment(t *testing.T) {
 			},
 		},
 		Products: []BookShipmentRequestBodyProduct{
-			BookShipmentRequestBodyProduct{
+			{
 				Name: "Test Product",
 				Sku: "TestProduct1",
 				Qty: 5,
@@ -106,7 +109,7 @@ func TestBookShipment(t *testing.T) {
 				CommodityCode: "8443991000",
 				CommodityManucountry: "GB",
 			},
-			BookShipmentRequestBodyProduct{
+			{
 				Name: "Test Product 2",
 				Sku: "TestProduct2",
 				Qty: 3,
@@ -120,4 +123,26 @@ func TestBookShipment(t *testing.T) {
 
 	_, err = client.BookShipment(body)
 	checkError(err)
+}
+
+// func TestVListShipments(t *testing.T) {
+// 	pw, err := os.ReadFile("./password.txt")
+// 	checkError(err)
+// 	password := string(pw)
+
+// 	client := ShiptheoryClient{
+// 		username: "dan.rogers@shiptheory.com",
+// 		password: password,
+// 		token: ShiptheoryToken{},
+// 	}
+
+// 	params := make(map[string]string)
+// 	params["created_from"] = "2022-05-19"
+
+// 	_, err = client.ListShipments(680)
+// 	checkError(err)
+// }
+
+func TestCamelToSnake(t *testing.T) {
+	t.Log(camelToSnake("ChannelReferenceId2"))
 }

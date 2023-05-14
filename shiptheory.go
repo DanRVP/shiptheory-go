@@ -53,7 +53,7 @@ func (client *ShiptheoryClient) ViewShipment(id int) (res_body ViewShipmentRespo
 	checkError(err)
 
 	endpoint := "shipments/" + strconv.Itoa(id)
-	var err_body TokenErrorBody = TokenErrorBody{}
+	var err_body ShipmentErrorBody = ShipmentErrorBody{}
 	err = client.makeShiptheoryApiRequest(http.MethodGet, endpoint, nil, &res_body, &err_body)
 	checkError(err)
 
@@ -65,13 +65,12 @@ func (client *ShiptheoryClient) ViewShipment(id int) (res_body ViewShipmentRespo
 }
 
 // Make a POST request to `shipments`
-func (client *ShiptheoryClient) BookShipment(body BookShipmentRequestBody) (res_body ViewShipmentResponseBody, err error) {
+func (client *ShiptheoryClient) BookShipment(body BookShipmentRequestBody) (res_body BookShipmentResponseBody, err error) {
 	err = client.validateToken(client.username, client.password)
 	checkError(err)
 
-	endpoint := "shipments"
 	var err_body TokenErrorBody = TokenErrorBody{}
-	err = client.makeShiptheoryApiRequest(http.MethodPost, endpoint, body, &res_body, &err_body)
+	err = client.makeShiptheoryApiRequest(http.MethodPost, "shipments", body, &res_body, &err_body)
 	checkError(err)
 
 	if err_body.Message != "" {
@@ -80,3 +79,20 @@ func (client *ShiptheoryClient) BookShipment(body BookShipmentRequestBody) (res_
 
 	return res_body, nil
 }
+
+// Make a GET request to `shipments/list`
+// func (client *ShiptheoryClient) ListShipments(params map[string][string]) (res_body ViewShipmentResponseBody, err error) {
+// 	err = client.validateToken(client.username, client.password)
+// 	checkError(err)
+
+// 	endpoint := "shipments/list?" + buildQueryString(params)
+// 	var err_body ShipmentErrorBody = ShipmentErrorBody{}
+// 	err = client.makeShiptheoryApiRequest(http.MethodGet, endpoint, nil, &res_body, &err_body)
+// 	checkError(err)
+
+// 	if err_body.Message != "" {
+// 		return res_body, errors.New(err_body.Message)
+// 	}
+
+// 	return res_body, nil
+// }

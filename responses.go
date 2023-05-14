@@ -44,3 +44,21 @@ type ViewShipmentResponseBodyMessage struct {
 	Created string `json:"created"`
 	Type string `json:"type"`
 }
+
+type BookShipmentResponseBody struct {
+	Success bool `json:"success"`
+	Status string `json:"status"`
+	CarrierResult *BookShipmentResponseBodyCarrierResult `json:"carrier_result"`
+	Message string `json:"message"`
+}
+
+type BookShipmentResponseBodyCarrierResult struct {
+	Status string `json:"status"`
+	Carrier string `json:"carrier"`
+	ServiceName string `json:"service_name"`
+	ServiceCode string `json:"service_code"`
+	Tracking string `json:"tracking"`
+	NoTracking *string `json:"no_tracking"`
+	ShipmentCost *float64 `json:"shipment_cost"`
+	Paperless bool `json:"paperless"`
+}

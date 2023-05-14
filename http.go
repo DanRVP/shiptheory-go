@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"time"
 	"errors"
-	"log"
 	"io"
 )
 
@@ -64,12 +64,6 @@ func (shiptheoryClient *ShiptheoryClient) makeShiptheoryApiRequest(method string
 	return err
 }
 
-func checkError(err error) {
-	if err != nil {
-        log.Fatal(err)
-    }
-}
-
 // Validate whether a string is a valid HTTP method supported by Shiptheory's API.
 func isValidHttpMethod(method string) bool {
 	valid_methods := [3]string{http.MethodGet, http.MethodPost, http.MethodPut}
@@ -93,4 +87,13 @@ func (shiptheoryClient *ShiptheoryClient) appendHeaders(req *http.Request) {
 	if shiptheoryClient.partnerTag != "" {
 		req.Header.Add("Shiptheory-Partner-Tag", shiptheoryClient.partnerTag)
 	}
+}
+
+func buildQueryString(params map[string]string) string {
+	query := url.Values{}
+	for key, value := range params {
+		query.Add(key, value)
+	}
+
+	return query.Encode()
 }
