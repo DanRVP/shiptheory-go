@@ -85,7 +85,7 @@ func (client *ShiptheoryClient) BookShipment(body BookShipmentRequestBody) (res_
 // 	err = client.validateToken(client.username, client.password)
 // 	checkError(err)
 
-// 	endpoint := "shipments/list?" + buildQueryString(params)
+	// endpoint := "shipments/list?" + buildQueryString(params)
 // 	var err_body ShipmentErrorBody = ShipmentErrorBody{}
 // 	err = client.makeShiptheoryApiRequest(http.MethodGet, endpoint, nil, &res_body, &err_body)
 // 	checkError(err)

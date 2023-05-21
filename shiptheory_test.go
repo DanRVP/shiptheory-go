@@ -146,3 +146,12 @@ func TestBookShipment(t *testing.T) {
 func TestCamelToSnake(t *testing.T) {
 	t.Log(camelToSnake("ChannelReferenceId2"))
 }
+
+func TestBuildQueryString(t *testing.T) {
+	query := ListShipmentsQuery {
+		ChannelName: "Magento 2",
+	}
+
+	res := buildQueryString(query)
+	t.Log(res)
+}

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
-	"net/url"
 	"time"
 	"errors"
 	"io"
@@ -87,13 +86,4 @@ func (shiptheoryClient *ShiptheoryClient) appendHeaders(req *http.Request) {
 	if shiptheoryClient.partnerTag != "" {
 		req.Header.Add("Shiptheory-Partner-Tag", shiptheoryClient.partnerTag)
 	}
-}
-
-func buildQueryString(params map[string]string) string {
-	query := url.Values{}
-	for key, value := range params {
-		query.Add(key, value)
-	}
-
-	return query.Encode()
 }
