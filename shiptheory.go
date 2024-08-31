@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"time"
 	"errors"
+	"github.com/google/go-querystring/query"
 )
 
 type ShiptheoryClient struct {
@@ -69,8 +70,28 @@ func (client *ShiptheoryClient) BookShipment(body BookShipmentRequestBody) (res_
 	err = client.validateToken(client.username, client.password)
 	checkError(err)
 
-	var err_body TokenErrorBody = TokenErrorBody{}
+	var err_body ShipmentErrorBody = ShipmentErrorBody{}
 	err = client.makeShiptheoryApiRequest(http.MethodPost, "shipments", body, &res_body, &err_body)
+	checkError(err)
+
+	if err_body.Message != "" && err_body.Code != 0 {
+		return res_body, errors.New(err_body.Message)
+	}
+
+	return res_body, nil
+}
+
+// Make a GET request to `shipments/list`
+func (client *ShiptheoryClient) ListShipments(params ListShipmentsQuery) (res_body ViewShipmentResponseBody, err error) {
+	err = client.validateToken(client.username, client.password)
+	checkError(err)
+
+	queryString, err := query.Values(params)
+	checkError(err)
+
+	endpoint := "shipments/list?" + queryString.Encode()
+	var err_body ShipmentErrorBody = ShipmentErrorBody{}
+	err = client.makeShiptheoryApiRequest(http.MethodGet, endpoint, nil, &res_body, &err_body)
 	checkError(err)
 
 	if err_body.Message != "" {
@@ -79,20 +100,3 @@ func (client *ShiptheoryClient) BookShipment(body BookShipmentRequestBody) (res_
 
 	return res_body, nil
 }
-
-// Make a GET request to `shipments/list`
-// func (client *ShiptheoryClient) ListShipments(params map[string][string]) (res_body ViewShipmentResponseBody, err error) {
-// 	err = client.validateToken(client.username, client.password)
-// 	checkError(err)
-
-	// endpoint := "shipments/list?" + buildQueryString(params)
-// 	var err_body ShipmentErrorBody = ShipmentErrorBody{}
-// 	err = client.makeShiptheoryApiRequest(http.MethodGet, endpoint, nil, &res_body, &err_body)
-// 	checkError(err)
-
-// 	if err_body.Message != "" {
-// 		return res_body, errors.New(err_body.Message)
-// 	}
-
-// 	return res_body, nil
-// }

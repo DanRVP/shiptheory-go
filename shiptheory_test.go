@@ -125,33 +125,26 @@ func TestBookShipment(t *testing.T) {
 	checkError(err)
 }
 
-// func TestVListShipments(t *testing.T) {
-// 	pw, err := os.ReadFile("./password.txt")
-// 	checkError(err)
-// 	password := string(pw)
+func TestListShipments(t *testing.T) {
+	pw, err := os.ReadFile("./password.txt")
+	checkError(err)
+	password := string(pw)
 
-// 	client := ShiptheoryClient{
-// 		username: "dan.rogers@shiptheory.com",
-// 		password: password,
-// 		token: ShiptheoryToken{},
-// 	}
+	client := ShiptheoryClient{
+		username: "dan.rogers@shiptheory.com",
+		password: password,
+		token: ShiptheoryToken{},
+	}
 
-// 	params := make(map[string]string)
-// 	params["created_from"] = "2022-05-19"
+	query := ListShipmentsQuery{
+		Created: "2024-08-10",
+	}
 
-// 	_, err = client.ListShipments(680)
-// 	checkError(err)
-// }
+	_, err = client.ListShipments(query)
+	checkError(err)
+}
 
 func TestCamelToSnake(t *testing.T) {
 	t.Log(camelToSnake("ChannelReferenceId2"))
 }
 
-func TestBuildQueryString(t *testing.T) {
-	query := ListShipmentsQuery {
-		ChannelName: "Magento 2",
-	}
-
-	res := buildQueryString(query)
-	t.Log(res)
-}

@@ -53,12 +53,13 @@ func (shiptheoryClient *ShiptheoryClient) makeShiptheoryApiRequest(method string
 		return err
 	}
 
-	if res.StatusCode >= 200 && res.StatusCode < 300 {
-		err = json.Unmarshal(res_body, &success_body)
-	} else {
-		err = json.Unmarshal(res_body, &error_body)
+	err = json.Unmarshal(res_body, &success_body)
+	if (err != nil) {
+		res.Body.Close()
+		return err
 	}
 
+	err = json.Unmarshal(res_body, &error_body)
 	res.Body.Close()
 	return err
 }
